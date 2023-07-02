@@ -3,8 +3,7 @@ import express, { Express, Request, Response } from "express";
 import connect from "./config/db";
 import { WordType } from "./enums/word-type.enum";
 import { WordModel, WordInterface } from "./interfaces/word.interface";
-import { seedDatabase } from "./config/seed_db";
-require("dotenv").config();
+import { SentenceModel } from "./interfaces/sentence.interface";
 
 // Create the Express application
 const app: Express = express();
@@ -48,6 +47,18 @@ app.get("/words/:type", async (req: Request, res: Response) => {
 });
 
 // save sentence
+app.post("/sentence", async (req: Request, res: Response) => {
+  const { sentence } = req.body;
+
+  try {
+    // Save the sentence to the database
+    const savedSentence = await SentenceModel.create({ sentence });
+    res.json({ sentence: savedSentence });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 // generate dynamic sentence
 
