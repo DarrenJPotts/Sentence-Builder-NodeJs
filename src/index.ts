@@ -54,6 +54,18 @@ app.get("/words/:type", async (req: Request, res: Response) => {
   }
 });
 
+// get all sentences
+app.get("/sentences", async (_req: Request, res: Response) => {
+  try {
+    const sentences = await SentenceModel.find().exec();
+
+    res.json({ sentences: sentences });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // save sentence
 app.post("/sentence", async (req: Request, res: Response) => {
   const { sentence } = req.body;
