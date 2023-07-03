@@ -2,14 +2,22 @@ import bodyParser from "body-parser";
 import express, { Express, Request, Response } from "express";
 import connect from "./config/db";
 import { WordType } from "./enums/word-type.enum";
-import { WordModel, WordInterface } from "./interfaces/word.interface";
 import { SentenceModel } from "./interfaces/sentence.interface";
+import { WordInterface, WordModel } from "./interfaces/word.interface";
+import cors from "cors";
 
 // Create the Express application
 const app: Express = express();
 const port = 8080;
 
 // Middleware to parse JSON requests
+app.use(
+  cors({
+    methods: ["GET", "POST"],
+    credentials: true,
+    origin: true,
+  })
+);
 app.use(express.json());
 app.use(bodyParser.json());
 
@@ -49,18 +57,16 @@ app.get("/words/:type", async (req: Request, res: Response) => {
 // save sentence
 app.post("/sentence", async (req: Request, res: Response) => {
   const { sentence } = req.body;
-
+  console.log(sentence);
   try {
     // Save the sentence to the database
-    const savedSentence = await SentenceModel.create({ sentence });
-    res.json({ sentence: savedSentence });
+    await SentenceModel.create({ sentence });
+    res.json(true);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-// generate dynamic sentence
 
 // Start the server
 // Connect to MongoDB Atlas and start the server
