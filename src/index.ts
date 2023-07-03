@@ -1,10 +1,13 @@
 import bodyParser from "body-parser";
-import express, { Express, Request, Response } from "express";
-import connect from "./config/db";
-import { WordType } from "./enums/word-type.enum";
-import { SentenceModel } from "./interfaces/sentence.interface";
-import { WordInterface, WordModel } from "./interfaces/word.interface";
 import cors from "cors";
+import express, { Express } from "express";
+import connect from "./config/db";
+import {
+  getAllSentences,
+  getWords,
+  getWordsByType,
+  saveSentence,
+} from "./controllers/sentence-builder.controller";
 
 // Create the Express application
 const app: Express = express();
@@ -23,62 +26,16 @@ app.use(bodyParser.json());
 
 // endpoints
 // get all words
-app.get("/words", async (_req: Request, res: Response) => {
-  try {
-    const words = await WordModel.find().exec();
-
-    res.json({ words: words });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
+app.get("/words", getWords);
 
 // get words by type
-app.get("/words/:type", async (req: Request, res: Response) => {
-  const { type } = req.params;
-
-  if (!(type in WordType)) {
-    res.status(400).json({ error: "Invalid word type" });
-    return;
-  }
-
-  try {
-    const words = await WordModel.find({ type }).exec();
-    const wordList = words.map((word: WordInterface) => word.word);
-
-    res.json({ words: wordList });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
+app.get("/words/:type", getWordsByType);
 
 // get all sentences
-app.get("/sentences", async (_req: Request, res: Response) => {
-  try {
-    const sentences = await SentenceModel.find().exec();
-
-    res.json({ sentences: sentences });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
+app.get("/sentences", getAllSentences);
 
 // save sentence
-app.post("/sentence", async (req: Request, res: Response) => {
-  const { sentence } = req.body;
-  console.log(sentence);
-  try {
-    // Save the sentence to the database
-    await SentenceModel.create({ sentence });
-    res.json(true);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
+app.post("/sentence", saveSentence);
 
 // Start the server
 // Connect to MongoDB Atlas and start the server
