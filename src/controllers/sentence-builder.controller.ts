@@ -51,11 +51,27 @@ export async function getAllSentences(_req: Request, res: Response) {
 // save sentence
 export async function saveSentence(req: Request, res: Response) {
   const { sentence } = req.body;
-  console.log(sentence);
+
   try {
     // Save the sentence to the database
     await SentenceModel.create({ sentence });
     res.json(true);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+// return random words
+export async function randomWords(req: Request, res: Response) {
+  const { length = 10 } = req.params;
+  try {
+    const words = await WordModel.aggregate([
+      { $sample: { size: Number(length) } },
+    ]);
+    const wordList = words.map((word: WordInterface) => word);
+
+    res.json({ words: wordList });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });

@@ -6,6 +6,7 @@ import {
   getAllSentences,
   getWords,
   getWordsByType,
+  randomWords,
   saveSentence,
 } from "./controllers/sentence-builder.controller";
 
@@ -36,6 +37,9 @@ app.get("/sentences", getAllSentences);
 
 // save sentence
 app.post("/sentence", saveSentence);
+
+// get random words
+app.get("/random-words/:length?", randomWords);
 
 // Start the server
 // Connect to MongoDB Atlas and start the server
